@@ -1,0 +1,72 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: system
+    password: 123
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+openapi:
+  service:
+    api-docs: api-service
+    description: API Documents
+    serverUrl: http://localhost:${server.port}
+    title: SPORT WEBSITE
+    version: 25.08.2003
+
+jwt:
+  expiryHour: 1
+  expiryDay: 3
+  privateKey: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCQBVTYrPc6tAqC
+    tyTeT3ReGPHD/vvznvHp94k4LK5DvIKUKn+Z1kygvm7lhM7bVv9Bj4x1QqMCx/Mf
+    VbSzaOYlWbQUaPj/glov1vPWoZ+K5SdZhx585ayJXuyR1Y8wYbKaCwYi4Aocg3TO
+    2wkXk/by+pfrZkM7CNriJ5VrOWLjmm+hFeiw8qgmhu+Wv3Hk4bBXMMbqIwdJeg5N
+    1doclxsOLfU4bEtvZKsKup2M25+JX2vXQZkNPlaWs3q/1jT1H0WM6xcxW+OWBJeN
+    LvuokSvLLvGJlpKPgF1hV3QKHx05ey31zfYKDJZPDw6ROGUox5iEx5DKAgPlP+Ss
+    8XJs4WTVAgMBAAECggEAAhbptmO6tIcp2IqoBh0DVF1/8yGEbfJCPUGXo+aAuBUz
+    PyC8uDJ+lchy2xv0VQSr8GYQ73SXi9ydyjhtRjsWjQ0s9SzZYU+hV6ytM1HQpZcR
+    3T/TcT7IeY0Ug+skHYYVWBx31X1dottEuxQ8y12ctBrEUH3Wf4lEhQp2UFdv+AW0
+    gfe2Jv5NQ7Rf/8X3dihOwyGkooK3qJd0jbl2lq+FHvQUaluh5QqeoGLOvT/1CoSX
+    EpaWhkKPsX5BYdUOG+Fi5BUviZbp95uMGbeJEZr5uMDM2s8MEoniCzTZYGhRqYqZ
+    BAsHlliWBVK+hG/ei90L3cIsoj/DzqMGk/InslhQAQKBgQDHCQb2MzGeVXbFouAq
+    9jdjWMAPuZQqak+HHQQowjNp8AYuRpsD3TLergqQJOfkEgSeSOymoq31tQhshoD8
+    DVq2CEfB2Xh0dxDAnuXvwinqe6G7vuwHy5LMKji5x/t9yzhrCfmkM0l1QcLx/968
+    gWnUQZ+6iq92hEIz3QzQRqxYAQKBgQC5PX2dzkS3P66lIjwwxspclMpBT9/QFuma
+    TZP/e0wBlQO8DqhsDQICHkmHZmsbDV/ZZjeR2IY/7hyeG5la77YsT/tAfjkUyTJK
+    ob2MpbrD60yy3jZaagPB1V7rGcpliZAyWP4yJbEgRMdUp66+ClS677nWZw/yGaSm
+    XUUSYFws1QKBgG0ysrMY2zw3P3anKb3oX/MNmjIGaxfqQ7+pV8LU6UhR+9IfwqSY
+    E3TAn+L9nIwwpoABGnVCA5cuv3RrRxECcqY0XMop+kBLotFLXHPyXvTa550N3olY
+    Uy3YbE7hPUWC3W08h85ipQbEEaSb8SQTDHD7oBrERAgOABRcTs9mNuABAoGAFXP/
+    plULNEXVzh4m5mc/bHV27xV3EDx3FX3ClCYNaWl+ozr3WnwvLVugnGPKJ7nmzeC+
+    ss9mzOSgv9bmbdexO3SP3qo/ph6fCnGs6CsRdDs+CMEffl0kzkAN3CCChjvmTU5t
+    MhWXa+tLQoyg+jVsFrJIzYHmIN3DadkHdNdgFXkCgYB3ZssUqB8n2LrW1zmqYHYI
+    l4Ig5jvQ5SdLxM/p4Fjw1pmU5S3GzvuSDoyMQ1f5WBC/bv6eNDWRZsbFPB7E79K6
+    oezLvZumBccSHOlqVZ4UWZNGxYuwfXFEg83bshPyuMIWkxMzpADfHRSPFBEOW7Iv
+    IbSM27BWxw2j3eg57Z6Rpw==
+    -----END PRIVATE KEY-----
+  publicKey: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkAVU2Kz3OrQKgrck3k90
+    Xhjxw/77857x6feJOCyuQ7yClCp/mdZMoL5u5YTO21b/QY+MdUKjAsfzH1W0s2jm
+    JVm0FGj4/4JaL9bz1qGfiuUnWYcefOWsiV7skdWPMGGymgsGIuAKHIN0ztsJF5P2
+    8vqX62ZDOwja4ieVazli45pvoRXosPKoJobvlr9x5OGwVzDG6iMHSXoOTdXaHJcb
+    Di31OGxLb2SrCrqdjNufiV9r10GZDT5WlrN6v9Y09R9FjOsXMVvjlgSXjS77qJEr
+    yy7xiZaSj4BdYVd0Ch8dOXst9c32CgyWTw8OkThlKMeYhMeQygID5T/krPFybOFk
+    1QIDAQAB
+    -----END PUBLIC KEY-----
+  resetKey: SXTxaCm9E3a49MEuKP5bBHF8PM9iE0yMmwktzAMyYGx3Tb5yRpEOn2r1Mydl6+rIYrqQhfOVoncVU7Fd5jgRjA==

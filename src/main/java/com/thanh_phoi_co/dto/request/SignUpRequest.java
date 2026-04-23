@@ -6,15 +6,13 @@ import com.thanh_phoi_co.dto.validator.ValidLocalDateTime;
 import com.thanh_phoi_co.enums.Gender;
 import com.thanh_phoi_co.enums.UserStatus;
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,9 +37,12 @@ public class SignUpRequest implements Serializable {
 
     @PhoneNumber
     private String phone;
+// dùng như này th không cần custom validate
+    @Past(message = "Date of birth must be in the past")
+    private LocalDate dateOfBirth;
 
-    @ValidLocalDateTime(pattern = "yyyy-MM-dd HH:mm:ss", future = true, message = "Date of birth must be in the future")
-    private LocalDateTime dateOfBirth;
+//    @ValidLocalDateTime(pattern = "yyyy-MM-dd HH:mm:ss", future = true, message = "Date of birth must be in the future")
+//    private LocalDateTime dateOfBirth;
 
     @EnumValue(enumClass = Gender.class, message = "Gender must be one of the following: {enum}")
     private Gender gender;
@@ -64,6 +65,6 @@ public class SignUpRequest implements Serializable {
     @NotEmpty(message = "Password confirm must be not empty")
     private String confirmPassword;
 
-    private List<String> roles;
+//    private List<String> roles;
 
 }

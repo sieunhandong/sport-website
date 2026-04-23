@@ -2,6 +2,8 @@ package com.thanh_phoi_co.service.impl;
 
 import com.thanh_phoi_co.configuration.JwtProvider;
 import com.thanh_phoi_co.enums.TokenType;
+import com.thanh_phoi_co.exception.AppException;
+import com.thanh_phoi_co.exception.ErrorCode;
 import com.thanh_phoi_co.exception.InvalidDataException;
 import com.thanh_phoi_co.repository.UserRepository;
 import com.thanh_phoi_co.service.JwtService;
@@ -36,13 +38,21 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.expiryDay}")
     private Long expiryDay;
     @Override
-    public String generateToken(UserDetails user) throws Exception {
-        return generateToken(new HashMap<>(), user);
+    public String generateToken(UserDetails user) {
+        try {
+            return generateToken(new HashMap<>(), user);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.TOKEN_GENERATION_FAILED);
+        }
     }
 
     @Override
-    public String generateRefreshToken(UserDetails user) throws Exception {
-        return generateRefreshToken(new HashMap<>(), user);
+    public String generateRefreshToken(UserDetails user) {
+        try {
+            return generateRefreshToken(new HashMap<>(), user);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.TOKEN_GENERATION_FAILED);
+        }
     }
 
     @Override

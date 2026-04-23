@@ -46,38 +46,46 @@ public class AuthenticationService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
 
-    public TokenResponse authenticate(LoginRequest signInRequest) throws Exception {
-        log.info("----------------authenticate---------------");
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(), signInRequest.getPassword()));
+    public TokenResponse authenticate(LoginRequest request) {
 
+        log.info("-------- authenticate --------");
 
-        var user = userRepository.findByUsername(signInRequest.getUsername()).orElseThrow(()-> new UsernameNotFoundException("Username or password incorrect"));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            // ❗ sai username/password
+            throw new InvalidDataException("Username or password incorrect");
+        }
 
+        var user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new InvalidDataException("User not found"));
 
-        // Kiểm tra trạng thái người dùng
+        // ❗ check status
         if (user.getStatus() == UserStatus.INACTIVE) {
-            log.info("User {} is inactive and cannot login.", user.getUsername());
-            // Ném ngoại lệ để xử lý lỗi ở controller hoặc phần khác
             throw new AppException(ErrorCode.USER_INACTIVE);
         }
-        String access_token = jwtService.generateToken(user);
-        String refresh_token = jwtService.generateRefreshToken(user);
+
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         user.setLastLogin(new Date());
-
         userRepository.save(user);
 
-        //save token to database
+        // save token
         tokenService.save(Token.builder()
                 .username(user.getUsername())
-                .accessToken(access_token)
-                .refreshToken(refresh_token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build());
 
-
         return TokenResponse.builder()
-                .accessToken(access_token)
-                .refreshToken(refresh_token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .userId(user.getId())
                 .build();
     }
@@ -187,9 +195,9 @@ public class AuthenticationService {
             throw new InvalidDataException("Username already exists");
         }
 
-        // if (userRepository.existsByEmail(request.getEmail())) {
-        //     throw new InvalidDataException("Email already exists");
-        // }
+         if (userRepository.existsByEmail(request.getEmail())) {
+             throw new InvalidDataException("Email already exists");
+         }
 
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new InvalidDataException("Password does not match");

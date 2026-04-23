@@ -5,6 +5,7 @@ import com.thanh_phoi_co.enums.UserStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class UserResponse {
     String lastName;
     String email;
     String phone;
-    LocalDateTime dateOfBirth;
+    LocalDate dateOfBirth;
     Gender gender;
     UserStatus status;
     String username;

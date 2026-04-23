@@ -6,10 +6,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Date;
 
 public interface JwtService {
-    String generateToken (UserDetails user) throws Exception;
+    String generateToken(UserDetails user);
 
-    String generateRefreshToken (UserDetails user) throws Exception;
-
+    String generateRefreshToken(UserDetails user);
     String generateResetToken (UserDetails user) throws Exception;
 
     String extractUsername(String token, TokenType type) throws Exception;

@@ -16,9 +16,9 @@ public class Token extends AbstractEntity<String>{
     @Column(name = "username", unique = true)
     private String username;
 
-    @Column(name = "access_token")
+    @Column(name = "access_token", length = 500)
     private String accessToken;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token", length = 500)
     private String refreshToken;
 }

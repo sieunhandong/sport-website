@@ -56,41 +56,45 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateResetToken(UserDetails user) throws Exception {
+    public String generateResetToken(UserDetails user) {
         return generateResetToken(new HashMap<>(),user);
     }
 
     @Override
-    public String extractUsername(String token, TokenType type) throws Exception {
+    public String extractUsername(String token, TokenType type) {
         return extractClaim(token,type, Claims::getSubject);
     }
 
     @Override
-    public boolean isValid(String token, TokenType type, UserDetails userDetails) throws Exception {
+    public boolean isValid(String token, TokenType type, UserDetails userDetails) {
         final String username = extractUsername(token, type);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token,type));
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token, type);
     }
 
 
     // giai ma token
-    private Claims extraAllClaim(String token, TokenType type) throws Exception {
-        return Jwts.parserBuilder()
-                .setSigningKey(getPublicKey(type)) //cung cap khoa bi mat de giai ma
-                .build()
-                .parseClaimsJws(token)//giai ma token lay thong tin tu claim
-                .getBody(); //tra ve cac claim cua token
+    private Claims extraAllClaim(String token, TokenType type) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getPublicKey(type))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+        } catch (io.jsonwebtoken.JwtException e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
     }
-
     //truy xuat 1 claim tu token ca tra ve voi bat ky gia tri nao cua claim
-    private  <T> T extractClaim(String token, TokenType type, Function<Claims, T> claimResolver) throws Exception {
-        final Claims claims = extraAllClaim(token, type);
-        return claimResolver.apply(claims);
+    private <T> T extractClaim(String token, TokenType type, Function<Claims, T> resolver) {
+        return resolver.apply(extraAllClaim(token, type));
     }
 
-    private boolean isTokenExpired(String token, TokenType type) throws Exception {
+    private boolean isTokenExpired(String token, TokenType type) {
         return extractExpiration(token, type).before(new Date());
     }
-    private Date extractExpiration(String token, TokenType type) throws Exception {
+    private Date extractExpiration(String token, TokenType type) {
         return extractClaim(token,type , Claims::getExpiration);
     }
     @Override
@@ -119,7 +123,7 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    private String generateResetToken(Map<String, Object> claims, UserDetails userDetails) throws Exception {
+    private String generateResetToken(Map<String, Object> claims, UserDetails userDetails){
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
@@ -129,33 +133,17 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    private PrivateKey getKey(TokenType type) throws Exception {
-        switch (type) {
-            case ACCESS_TOKEN -> {
-                return jwtProvider.getPrivateKey();
-            }
-            case REFRESH_TOKEN -> {
-                return jwtProvider.getPrivateKey();
-            }
-            case RESET_TOKEN -> {
-                return jwtProvider.getPrivateKey();
-            }
+    private PrivateKey getKey(TokenType type) {
+        return switch (type) {
+            case ACCESS_TOKEN, REFRESH_TOKEN, RESET_TOKEN -> jwtProvider.getPrivateKey();
             default -> throw new InvalidDataException("Token type invalid");
-        }
+        };
     }
-    private PublicKey getPublicKey(TokenType type) throws Exception {
-        switch (type) {
-            case ACCESS_TOKEN -> {
-                return jwtProvider.getPublicKey();
-            }
-            case REFRESH_TOKEN -> {
-                return jwtProvider.getPublicKey();
-            }
-            case RESET_TOKEN -> {
-                return jwtProvider.getPublicKey();
-            }
+    private PublicKey getPublicKey(TokenType type) {
+        return switch (type) {
+            case ACCESS_TOKEN, REFRESH_TOKEN, RESET_TOKEN -> jwtProvider.getPublicKey();
             default -> throw new InvalidDataException("Token type invalid");
-        }
+        };
     }
 
 

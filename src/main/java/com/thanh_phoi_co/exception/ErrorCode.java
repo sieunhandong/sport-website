@@ -15,6 +15,11 @@ public enum ErrorCode {
     USER_INACTIVE(400,"Your account is inactive",HttpStatus.BAD_REQUEST),
 
     TOKEN_GENERATION_FAILED(400,"Generate token failed",HttpStatus.BAD_REQUEST),
+    TOKEN_EXPIRED(400,"Token expired",HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN(400,"Token invalid",HttpStatus.BAD_REQUEST),
+    INVALID_PUBLIC_KEY(400,"Public Key invalid",HttpStatus.BAD_REQUEST),
+    KEY_PARSE_FAILED(400,"KEY_PARSE_FAILED",HttpStatus.BAD_REQUEST),
+
     ENUM_INVALID(400,"Enums invalid",HttpStatus.BAD_REQUEST);
     private int status;
     private String message;

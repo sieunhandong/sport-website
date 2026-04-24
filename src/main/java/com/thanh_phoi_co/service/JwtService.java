@@ -9,11 +9,11 @@ public interface JwtService {
     String generateToken(UserDetails user);
 
     String generateRefreshToken(UserDetails user);
-    String generateResetToken (UserDetails user) throws Exception;
+    String generateResetToken (UserDetails user);
 
-    String extractUsername(String token, TokenType type) throws Exception;
+    String extractUsername(String token, TokenType type);
 
-    boolean isValid(String token, TokenType type, UserDetails userDetails) throws Exception;
+    boolean isValid(String token, TokenType type, UserDetails userDetails);
 
     Date extractLastActivity(String token, TokenType type) throws Exception;
 

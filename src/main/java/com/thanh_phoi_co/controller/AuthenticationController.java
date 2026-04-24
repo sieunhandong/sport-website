@@ -1,12 +1,10 @@
 package com.thanh_phoi_co.controller;
 
 import com.thanh_phoi_co.dto.request.ChangePasswordRequest;
+import com.thanh_phoi_co.dto.request.ForgetPasswordRequest;
 import com.thanh_phoi_co.dto.request.LoginRequest;
 import com.thanh_phoi_co.dto.request.SignUpRequest;
-import com.thanh_phoi_co.dto.response.ResponseData;
-import com.thanh_phoi_co.dto.response.ResponseError;
-import com.thanh_phoi_co.dto.response.TokenResponse;
-import com.thanh_phoi_co.dto.response.UserResponse;
+import com.thanh_phoi_co.dto.response.*;
 import com.thanh_phoi_co.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +44,28 @@ public class AuthenticationController {
                 .status(HttpStatus.OK.value())
                 .data(authenticationService.signUp(request))
                 .message("Sign Up success")
+                .build();
+    }
+
+    @Operation(summary = "API Change Password")
+    @PostMapping("/change-password")
+    public ResponseData<String> changePassword( @Valid @RequestBody ChangePasswordRequest request){
+        return ResponseData.<String>builder()
+                .status(HttpStatus.OK.value())
+                .data(authenticationService.changePassword(request))
+                .build();
+    }
+
+    @Operation(summary = "API yêu cầu forgot-password")
+    @PostMapping("/forgot-password")
+    public ResponseData<ForgotPasswordResponse> forgotPassword(
+            @Valid @RequestBody ForgetPasswordRequest request) {
+
+        ForgotPasswordResponse response = authenticationService.forgotPassword(request.getEmail());
+
+        return ResponseData.<ForgotPasswordResponse>builder()
+                .status(HttpStatus.OK.value())
+                .data(response)
                 .build();
     }
 

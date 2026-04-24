@@ -65,4 +65,26 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body("JSON không hợp lệ");
     }
+
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ResponseError> handleAppException(AppException ex) {
+        ErrorCode errorCode = ex.getErrorCode();
+
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(new ResponseError(
+                        errorCode.getStatus(),
+                        errorCode.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ResponseError> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ResponseError(
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
+                ));
+    }
 }

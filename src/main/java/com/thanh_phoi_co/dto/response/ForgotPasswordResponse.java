@@ -8,5 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ForgotPasswordResponse {
-    private String resetToken;
+    private String message;
 }

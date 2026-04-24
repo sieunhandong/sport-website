@@ -1,5 +1,7 @@
 package com.thanh_phoi_co.configuration;
 
+import com.thanh_phoi_co.exception.AppException;
+import com.thanh_phoi_co.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,7 @@ public class JwtProvider {
     @Value("${jwt.publicKey}")
     private String publicKeyStr;
 
-    public PrivateKey getPrivateKey() throws Exception {
+    public PrivateKey getPrivateKey() {
         try {
             String privateKeyPEM = privateKeyStr
                     .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -32,11 +34,13 @@ public class JwtProvider {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePrivate(keySpec);
         } catch (IllegalArgumentException e) {
-            throw new Exception("Base64 decoding error or Invalid Private Key format.", e);
+            throw new AppException(ErrorCode.INVALID_PUBLIC_KEY);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.KEY_PARSE_FAILED);
         }
     }
 
-    public PublicKey getPublicKey() throws Exception {
+    public PublicKey getPublicKey() {
         try {
             String publicKeyPEM = publicKeyStr
                     .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -46,9 +50,13 @@ public class JwtProvider {
             byte[] keyBytes = Base64.getDecoder().decode(publicKeyPEM);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
             return keyFactory.generatePublic(keySpec);
+
         } catch (IllegalArgumentException e) {
-            throw new Exception("Base64 decoding error or Invalid Public Key format.", e);
+            throw new AppException(ErrorCode.INVALID_PUBLIC_KEY);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.KEY_PARSE_FAILED);
         }
     }
 }

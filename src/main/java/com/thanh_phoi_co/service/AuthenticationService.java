@@ -45,7 +45,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
-
+    private final EmailService emailService;
     public TokenResponse authenticate(LoginRequest request) {
 
         log.info("-------- authenticate --------");
@@ -144,30 +144,31 @@ public class AuthenticationService {
     }
 
 
-    public ForgotPasswordResponse forgotPassword(String email) throws Exception {
-        //check email
+    public ForgotPasswordResponse forgotPassword(String email) {
+        log.info("------ forgotPassword ------");
+
         User user = userService.getByEmail(email);
 
-        //User is active or inactive
-        if(!user.isEnabled()){
+        if (!user.isEnabled()) {
             throw new InvalidDataException("User not active");
         }
 
-        //generate resetToken
+        //generate token
         String resetToken = jwtService.generateResetToken(user);
 
-        //send email confirmLink
-        String confirmLink = String.format("curl --location 'localhost:9001/auth/reset-password' \\\n" +
-                "--header 'Content-Type: application/json' \\\n" +
-                "--header 'Accept: */*' \\\n" +
-                "--header 'Cookie: JSESSIONID=F8082D07E3C74EAD1619C524CE3F8BD1' \\\n" +
-                "--data '{\n" +
-                "  \"token\": \"%s\"\n" +
-                "}'", resetToken);
-        log.info("confirmLink= {}",confirmLink);
+        // FE link
+        String resetLink = String.format(
+                "http://localhost:3000/reset-password?token=%s",
+                resetToken
+        );
+
+        // gửi mail
+        emailService.sendResetPasswordEmail(user.getEmail(), resetLink);
+
+        log.info("Reset password email sent to {}", user.getEmail());
 
         return ForgotPasswordResponse.builder()
-                .resetToken(resetToken)
+                .message("Reset password email sent successfully")
                 .build();
     }
 
@@ -219,27 +220,26 @@ public class AuthenticationService {
         return userMapper.toUserResponse(user);
     }
 
-    public String changePassword(ChangePasswordRequest request) throws Exception {
+    public String changePassword(ChangePasswordRequest request) {
         User user = isValidUserByToken(request.getSecretKey());
         if(!request.getPassword().equals(request.getConfirmPassword())){
             throw new InvalidDataException("Password not match");
-
         }
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         return "Changed Password successfully!!!";
     }
 
-    public User isValidUserByToken(String secretKey) throws Exception {
-        final String username = jwtService.extractUsername(secretKey,TokenType.RESET_TOKEN);
+    public User isValidUserByToken(String secretKey) {
+        final String username = jwtService.extractUsername(secretKey, TokenType.RESET_TOKEN);
         var user = userService.getByUsername(username);
 
-        if(!user.isEnabled()){
+        if (!user.isEnabled()) {
             throw new InvalidDataException("User not active");
         }
 
-        if(!jwtService.isValid(secretKey, TokenType.RESET_TOKEN,user)){
-            throw  new InvalidDataException("Not allow access with this token");
+        if (!jwtService.isValid(secretKey, TokenType.RESET_TOKEN, user)) {
+            throw new InvalidDataException("Not allow access with this token");
         }
 
         return user;

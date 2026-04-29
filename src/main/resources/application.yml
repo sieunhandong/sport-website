@@ -23,6 +23,13 @@ spring:
           auth: true
           starttls:
             enable: true
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.engine.jdbc.spi: DEBUG
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
 #  autoconfigure:
 #    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 springdoc:

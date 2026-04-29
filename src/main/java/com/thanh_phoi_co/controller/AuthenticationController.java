@@ -1,9 +1,6 @@
 package com.thanh_phoi_co.controller;
 
-import com.thanh_phoi_co.dto.request.ChangePasswordRequest;
-import com.thanh_phoi_co.dto.request.ForgetPasswordRequest;
-import com.thanh_phoi_co.dto.request.LoginRequest;
-import com.thanh_phoi_co.dto.request.SignUpRequest;
+import com.thanh_phoi_co.dto.request.*;
 import com.thanh_phoi_co.dto.response.*;
 import com.thanh_phoi_co.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,6 +62,20 @@ public class AuthenticationController {
 
         return ResponseData.<ForgotPasswordResponse>builder()
                 .status(HttpStatus.OK.value())
+                .data(response)
+                .build();
+    }
+    @Operation(summary = "API kiểm tra reset key")
+    @PostMapping("/check-reset-key")
+    public ResponseData<IntrospectResponse> resetPassword(
+            @Valid @RequestBody IntrospectRequest request) {
+
+        IntrospectResponse response =
+                authenticationService.validateResetToken(request.getToken());
+
+        return ResponseData.<IntrospectResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("ResetKey valid")
                 .data(response)
                 .build();
     }

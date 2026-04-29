@@ -1,6 +1,7 @@
 package com.thanh_phoi_co.exception;
 
 import com.thanh_phoi_co.dto.response.ResponseError;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Arrays;
-
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -37,12 +38,14 @@ public class GlobalExceptionHandler {
                 .body(new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     }
 
-    // ✅ Handle all other exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseError> handleException(Exception ex) {
+        ex.printStackTrace();                    // ← In ra console full lỗi
+        log.error("Unexpected error occurred", ex);   // Nếu bạn có logger
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ResponseError(500, "Internal server error"));
+                .body(new ResponseError(500, "Internal server error: " + ex.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

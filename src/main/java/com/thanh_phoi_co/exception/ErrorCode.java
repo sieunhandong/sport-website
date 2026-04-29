@@ -19,7 +19,9 @@ public enum ErrorCode {
     INVALID_TOKEN(400,"Token invalid",HttpStatus.BAD_REQUEST),
     INVALID_PUBLIC_KEY(400,"Public Key invalid",HttpStatus.BAD_REQUEST),
     KEY_PARSE_FAILED(400,"KEY_PARSE_FAILED",HttpStatus.BAD_REQUEST),
-
+    FORBIDDEN(403,"Khong co quyen",HttpStatus.FORBIDDEN),
+    ROLE_NOT_FOUND(404,"Some roles not found",HttpStatus.NOT_FOUND),
+    USER_NOT_FOUND(404,"User not found",HttpStatus.NOT_FOUND),
     ENUM_INVALID(400,"Enums invalid",HttpStatus.BAD_REQUEST);
     private int status;
     private String message;

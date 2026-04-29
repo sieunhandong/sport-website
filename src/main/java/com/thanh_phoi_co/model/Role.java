@@ -3,6 +3,7 @@ package com.thanh_phoi_co.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -17,6 +18,14 @@ public class Role {
     private String name;
     private String description;
 
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users = new HashSet<>();
+
     @ManyToMany
-    Set<Permission> permissions;
+    @JoinTable(
+            name = "tbl_role_permissions",
+            joinColumns = @JoinColumn(name = "role_name"),
+            inverseJoinColumns = @JoinColumn(name = "permissions_name")
+    )
+    private Set<Permission> permissions = new HashSet<>();
 }

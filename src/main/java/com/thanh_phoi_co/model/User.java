@@ -4,18 +4,13 @@ import com.thanh_phoi_co.enums.Gender;
 import com.thanh_phoi_co.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -53,10 +48,15 @@ public class User extends AbstractEntity<String> implements UserDetails, Seriali
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private UserStatus status;
-    @Column(name = "last_login", unique = true)
-    private Date lastLogin;
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
     @ManyToMany
-    private Set<Role> roles;
+    @JoinTable(
+            name = "tbl_user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "roles_name")   // Bỏ referencedColumnName
+    )
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() { return List.of();

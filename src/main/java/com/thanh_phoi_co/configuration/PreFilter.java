@@ -50,7 +50,10 @@ public class PreFilter extends OncePerRequestFilter {
         try {
             userName = jwtService.extractUsername(token, TokenType.ACCESS_TOKEN);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("JWT error: {}", e.getMessage());
+
+            filterChain.doFilter(request, response);
+            return;
         }
         final String roles;
         try {
@@ -76,7 +79,12 @@ public class PreFilter extends OncePerRequestFilter {
                     SecurityContextHolder.setContext(context);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("JWT error: {}", e.getMessage());
+
+                SecurityContextHolder.clearContext();
+
+                filterChain.doFilter(request, response);
+                return;
             }
         }
         filterChain.doFilter(request,response);

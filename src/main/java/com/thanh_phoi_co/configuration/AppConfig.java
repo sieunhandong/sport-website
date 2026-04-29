@@ -28,6 +28,8 @@ public class AppConfig {
 
     private final UserService userService;
     private final PreFilter preFilter;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtAccessDeniedHandler accessDeniedHandler;
 //    private String[] WHITE_LIST = {"/auth/**"};
 
     @Bean
@@ -38,7 +40,9 @@ public class AppConfig {
                         .requestMatchers("/permissions/**").hasAnyRole("ADMIN")
                         .requestMatchers("/role/**").hasAnyRole("ADMIN")
                         .anyRequest().permitAll())
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(provider()).addFilterBefore(preFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

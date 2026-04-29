@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @MappedSuperclass
@@ -18,11 +20,11 @@ public abstract class AbstractEntity<T extends Serializable> implements Serializ
     @Column(name = "id")
     private T id;
 
-    @Column(name = "created_at")
     @CreationTimestamp
-    private String createdAt;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
     @UpdateTimestamp
-    private String updated_at;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

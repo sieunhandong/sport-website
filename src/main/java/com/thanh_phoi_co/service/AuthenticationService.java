@@ -26,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
@@ -73,7 +74,7 @@ public class AuthenticationService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        user.setLastLogin(new Date());
+        user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
         // save token
@@ -134,7 +135,7 @@ public class AuthenticationService {
         final String username = jwtService.extractUsername(refresh_token, TokenType.REFRESH_TOKEN);
         Optional<User> user = userRepository.findByUsername(username);
 
-        user.get().setLastLogin(new Date());
+        user.get().setLastLogin(LocalDateTime.now());
         //check token in db
         Token currentToken = tokenService.getByUsername(username);
 
@@ -173,21 +174,39 @@ public class AuthenticationService {
     }
 
 
-    public IntrospectResponse resetPassword(String resetKey) throws Exception {
-        log.info("--------------------resetPassword---------------");
+    public IntrospectResponse validateResetToken(String resetKey) {
+        log.info("--------------------validateResetToken---------------");
 
-        final String username = jwtService.extractUsername(resetKey,TokenType.RESET_TOKEN);
-
-        var user = userService.getByUsername(username);
-        boolean isValid = true;
-
-        if(!jwtService.isValid(resetKey,TokenType.RESET_TOKEN, user)) {
-            throw new InvalidDataException("Not allow access with this token");
+        // 1. validate input
+        if (resetKey == null || resetKey.isBlank()) {
+            throw new InvalidDataException("Reset token must not be blank");
         }
 
-        return IntrospectResponse.builder()
-                .valid(isValid)
-                .build();
+        try {
+            // 2. extract username từ token
+            final String username = jwtService.extractUsername(resetKey, TokenType.RESET_TOKEN);
+
+            // 3. lấy user
+            var user = userService.getByUsername(username);
+
+            // 4. check user active
+            if (!user.isEnabled()) {
+                throw new InvalidDataException("User not active");
+            }
+
+            // 5. validate token
+            if (!jwtService.isValid(resetKey, TokenType.RESET_TOKEN, user)) {
+                throw new InvalidDataException("Token is invalid or expired");
+            }
+
+            // 6. hợp lệ
+            return IntrospectResponse.builder()
+                    .valid(true)
+                    .build();
+
+        } catch (Exception e) {
+            throw new InvalidDataException("Invalid or expired reset token");
+        }
     }
 
 

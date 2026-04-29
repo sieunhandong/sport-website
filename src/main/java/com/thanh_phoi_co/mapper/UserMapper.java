@@ -6,7 +6,7 @@ import com.thanh_phoi_co.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {RoleMapper.class})
 public interface UserMapper {
 
     @Mapping(target = "roles", ignore = true)

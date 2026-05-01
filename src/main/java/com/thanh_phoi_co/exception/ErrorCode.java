@@ -22,6 +22,7 @@ public enum ErrorCode {
     FORBIDDEN(403,"Khong co quyen",HttpStatus.FORBIDDEN),
     ROLE_NOT_FOUND(404,"Some roles not found",HttpStatus.NOT_FOUND),
     USER_NOT_FOUND(404,"User not found",HttpStatus.NOT_FOUND),
+    CATEGORY_ALREADY_EXISTS(400,"Tiêu đề đã tồn tại",HttpStatus.BAD_REQUEST),
     ENUM_INVALID(400,"Enums invalid",HttpStatus.BAD_REQUEST);
     private int status;
     private String message;

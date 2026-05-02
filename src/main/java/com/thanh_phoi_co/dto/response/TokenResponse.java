@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Set;
+
 @Getter
 @Setter
 @Builder
@@ -12,5 +14,6 @@ public class TokenResponse implements Serializable {
 
     private String accessToken;
     private String refreshToken;
+    private Set<String> roles;
     private String userId;
 }

@@ -22,12 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -59,72 +57,85 @@ public class AuthenticationService {
                     )
             );
         } catch (Exception e) {
-            // ❗ sai username/password
+            // Sai tài khoản hoặc mật khẩu
             throw new InvalidDataException("Username or password incorrect");
         }
 
         var user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new InvalidDataException("User not found"));
 
-        // ❗ check status
+        // Check trạng thái tài khoản
         if (user.getStatus() == UserStatus.INACTIVE) {
             throw new AppException(ErrorCode.USER_INACTIVE);
         }
 
+        // Generate JWT
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        // Update last login
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
-        // save token
-        tokenService.save(Token.builder()
-                .username(user.getUsername())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build());
+        tokenService.save(
+                Token.builder()
+                        .username(user.getUsername())
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build()
+        );
 
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
+                .roles(
+                        user.getRoles()
+                                .stream()
+                                .map(Role::getName)
+                                .collect(java.util.stream.Collectors.toSet())
+                )
                 .build();
     }
 
-    public AccessTokenResponse refresh(HttpServletRequest request) throws Exception {
+    public AccessTokenResponse refresh(HttpServletRequest request) {
 
         log.info("--------------refreshToken----------------");
-        //validate
-        String refresh_token = request.getHeader(AUTHORIZATION);
 
-        if(StringUtils.isBlank(refresh_token)){
-            throw new InvalidDataException("Token must be not blank");
+        String authHeader = request.getHeader(AUTHORIZATION);
+
+        if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
+            throw new InvalidDataException("Refresh token must be provided");
         }
 
-        //extract user from token
-        final String userName = jwtService.extractUsername(refresh_token, TokenType.REFRESH_TOKEN);
+        String refreshToken = authHeader.substring(7);
 
-        //check is into db
-        Optional<User> user = userRepository.findByUsername(userName);
+        final String userName = jwtService.extractUsername(
+                refreshToken,
+                TokenType.REFRESH_TOKEN
+        );
 
-        if(!jwtService.isValid(refresh_token, TokenType.REFRESH_TOKEN , user.get())){
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new InvalidDataException("User not found"));
+
+        if (!jwtService.isValid(refreshToken, TokenType.REFRESH_TOKEN, user)) {
             throw new InvalidDataException("Token is invalid");
         }
 
-        String access_token = jwtService.generateToken(user.get());
+        String accessToken = jwtService.generateToken(user);
 
         tokenService.save(Token.builder()
                 .username(userName)
-                .accessToken(access_token)
-                .refreshToken(refresh_token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build());
 
         return AccessTokenResponse.builder()
-                .accessToken(access_token)
-                .userId(user.get().getId())
+                .accessToken(accessToken)
+                .userId(user.getId())
                 .build();
     }
-    public String logout(HttpServletRequest request) throws Exception {
+    public String logout(HttpServletRequest request){
         log.info("-------logout---------");
 
         String refresh_token = request.getHeader(AUTHORIZATION);

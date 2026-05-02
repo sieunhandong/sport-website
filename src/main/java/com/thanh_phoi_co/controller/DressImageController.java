@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ public class DressImageController {
     @Operation(summary = "Upload nhiều ảnh cho váy lên Cloudinary và lưu vào DB")
     @PostMapping(value = "/dress/{dressId}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<List<DressImageResponse>> uploadImages(
             @PathVariable String dressId,
             @RequestPart("files") MultipartFile[] files,
@@ -45,6 +47,7 @@ public class DressImageController {
 
     @Operation(summary = "Cập nhật ảnh")
     @PutMapping("/{imageId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<DressImageResponse> updateImage(@PathVariable String imageId, @Valid @RequestBody DressImageRequest request) {
         DressImageResponse response = dressImageService.updateImage(imageId, request);
         return ResponseData.<DressImageResponse>builder()
@@ -56,6 +59,7 @@ public class DressImageController {
 
     @Operation(summary = "Xóa ảnh")
     @DeleteMapping("/{imageId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> deleteImage(@PathVariable String imageId) {
         dressImageService.deleteImage(imageId);
         return ResponseData.<String>builder()
@@ -77,6 +81,7 @@ public class DressImageController {
 
     @Operation(summary = "Lấy danh sách ảnh của váy")
     @GetMapping("/dress/{dressId}")
+    @PreAuthorize("permitAll()")
     public ResponseData<List<DressImageResponse>> getImagesByDressId(@PathVariable String dressId) {
         List<DressImageResponse> response = dressImageService.getImagesByDressId(dressId);
         return ResponseData.<List<DressImageResponse>>builder()

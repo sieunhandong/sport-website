@@ -5,15 +5,13 @@ import com.thanh_phoi_co.dto.response.*;
 import com.thanh_phoi_co.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -79,5 +77,31 @@ public class AuthenticationController {
                 .data(response)
                 .build();
     }
+    @Operation(summary = "API refresh token")
+    @PostMapping("/refresh-token")
+    public ResponseData<AccessTokenResponse> refreshToken(
+            HttpServletRequest request) {
 
+        AccessTokenResponse response = authenticationService.refresh(request);
+
+        return ResponseData.<AccessTokenResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("RefreshToken thành công")
+                .data(response)
+                .build();
+    }
+
+    @Operation(summary = "API logout")
+    @PostMapping("/logout")
+    public ResponseData<String> logout(HttpServletRequest request) {
+
+        String response =
+                authenticationService.logout(request);
+
+        return ResponseData.<String>builder()
+                .status(HttpStatus.OK.value())
+                .message("Đăng xuất thành công")
+                .data(response)
+                .build();
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class DressCategoryController {
 
     @Operation(summary = "Tạo danh mục váy mới")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<DressCategoryResponse> createCategory(@Valid @RequestBody DressCategoryRequest request) {
         DressCategoryResponse response = dressCategoryService.createCategory(request);
         return ResponseData.<DressCategoryResponse>builder()
@@ -41,6 +43,7 @@ public class DressCategoryController {
 
     @Operation(summary = "Cập nhật danh mục váy")
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<DressCategoryResponse> updateCategory(@PathVariable String id, @Valid @RequestBody DressCategoryRequest request) {
         DressCategoryResponse response = dressCategoryService.updateCategory(id, request);
         return ResponseData.<DressCategoryResponse>builder()
@@ -52,6 +55,7 @@ public class DressCategoryController {
 
     @Operation(summary = "Xóa danh mục váy")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> deleteCategory(@PathVariable String id) {
         dressCategoryService.deleteCategory(id);
         return ResponseData.<String>builder()
@@ -62,6 +66,7 @@ public class DressCategoryController {
 
     @Operation(summary = "Lấy thông tin danh mục theo ID")
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
     public ResponseData<DressCategoryResponse> getCategoryById(@PathVariable String id) {
         DressCategoryResponse response = dressCategoryService.getCategoryById(id);
         return ResponseData.<DressCategoryResponse>builder()
@@ -73,6 +78,7 @@ public class DressCategoryController {
 
     @Operation(summary = "Lấy danh sách tất cả danh mục")
     @GetMapping
+    @PreAuthorize("permitAll()")
     public ResponseData<Page<DressCategoryResponse>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -87,6 +93,7 @@ public class DressCategoryController {
 
     @Operation(summary = "Lấy danh sách tất cả danh mục (không phân trang)")
     @GetMapping("/all")
+    @PreAuthorize("permitAll()")
     public ResponseData<List<DressCategoryResponse>> getAllCategoriesList() {
         List<DressCategoryResponse> response = dressCategoryService.getAllCategories();
         return ResponseData.<List<DressCategoryResponse>>builder()

@@ -34,7 +34,9 @@ public class AppConfig {
 
     @Bean
     public SecurityFilterChain filterChain(@NonNull HttpSecurity http) throws Exception{
-        http.csrf(AbstractHttpConfigurer::disable)
+        http
+                .cors(cors ->{})
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/permissions/**").hasAnyRole("ADMIN")

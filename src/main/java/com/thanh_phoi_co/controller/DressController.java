@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class DressController {
 
     @Operation(summary = "Tạo váy mới")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<DressResponse> createDress(@Valid @RequestBody CreateDressRequest request) {
         DressResponse response = dressService.createDress(request);
         return ResponseData.<DressResponse>builder()
@@ -43,6 +45,7 @@ public class DressController {
 
     @Operation(summary = "Cập nhật váy")
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<DressResponse> updateDress(@PathVariable String id, @Valid @RequestBody UpdateDressRequest request) {
         DressResponse response = dressService.updateDress(id, request);
         return ResponseData.<DressResponse>builder()
@@ -54,6 +57,7 @@ public class DressController {
 
     @Operation(summary = "Xóa váy")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseData<String> deleteDress(@PathVariable String id) {
         dressService.deleteDress(id);
         return ResponseData.<String>builder()
@@ -64,6 +68,7 @@ public class DressController {
 
     @Operation(summary = "Lấy thông tin váy theo ID")
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
     public ResponseData<DressResponse> getDressById(@PathVariable String id) {
         DressResponse response = dressService.getDressById(id);
         return ResponseData.<DressResponse>builder()
@@ -75,6 +80,7 @@ public class DressController {
 
     @Operation(summary = "Lấy danh sách tất cả váy")
     @GetMapping
+    @PreAuthorize("permitAll()")
     public ResponseData<Page<DressResponse>> getAllDresses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -89,6 +95,7 @@ public class DressController {
 
     @Operation(summary = "Tìm kiếm váy theo từ khóa")
     @GetMapping("/search")
+    @PreAuthorize("permitAll()")
     public ResponseData<Page<DressResponse>> searchDresses(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -104,6 +111,7 @@ public class DressController {
 
     @Operation(summary = "Lọc váy")
     @GetMapping("/filter")
+    @PreAuthorize("permitAll()")
     public ResponseData<Page<DressResponse>> filterDresses(
             @RequestParam(required = false) DressStatus status,
             @RequestParam(required = false) String categoryId,
@@ -121,6 +129,7 @@ public class DressController {
     }
 
     @Operation(summary = "Lấy danh sách màu sắc")
+    @PreAuthorize("permitAll()")
     @GetMapping("/colors")
     public ResponseData<List<String>> getAllColors() {
         List<String> colors = dressService.getAllColors();
@@ -132,6 +141,7 @@ public class DressController {
     }
 
     @Operation(summary = "Lấy danh sách kích cỡ")
+    @PreAuthorize("permitAll()")
     @GetMapping("/sizes")
     public ResponseData<List<String>> getAllSizes() {
         List<String> sizes = dressService.getAllSizes();
